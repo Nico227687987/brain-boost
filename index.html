@@ -1,250 +1,1583 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
   <title>Brain Boost</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
-      background: linear-gradient(to bottom right, #111, #222);
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      font-family: 'Segoe UI', sans-serif;
       text-align: center;
-      padding: 30px;
+      min-height: 100vh;
+      overflow-x: hidden;
     }
-
-    h1 {
-      font-size: 2.5rem;
+    
+    header {
+      padding: 2em 1em 1em;
+      font-size: 2em;
+      font-weight: bold;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      position: relative;
     }
-
-    #user-info {
-      margin: 10px 0;
-      color: #ccc;
-    }
-
-    .menu {
+    
+    .stats {
       display: flex;
       justify-content: center;
       gap: 20px;
-      margin-top: 40px;
+      margin: 1em 0;
+      flex-wrap: wrap;
     }
-
-    .menu-btn {
-      background-color: #333;
-      color: white;
-      border: none;
-      padding: 20px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1.2rem;
-      width: 120px;
-      transition: background 0.3s;
+    
+    .stat-card {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 15px 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: transform 0.3s ease;
     }
-
-    .menu-btn:hover {
-      background-color: #555;
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
     }
-
-    .section {
-      display: none;
-      margin-top: 40px;
-    }
-
-    .section.active {
+    
+    .stat-number {
+      font-size: 1.5em;
+      font-weight: bold;
       display: block;
     }
-
-    .card {
-      background-color: #222;
-      padding: 20px;
+    
+    .stat-label {
+      font-size: 0.8em;
+      opacity: 0.8;
+    }
+    
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      padding: 2em 3em;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      display: none;
+      z-index: 1000;
+      text-align: center;
+      border: 2px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+    }
+    
+    .popup.show {
+      display: block;
+      animation: popupIn 0.3s ease-out;
+    }
+    
+    @keyframes popupIn {
+      from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+    
+    .game-section {
+      display: none;
+      margin: 2em auto;
+      max-width: 600px;
+      padding: 0 1em;
+      padding-bottom: 100px;
+    }
+    
+    .game-section.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .game-title {
+      font-size: 1.8em;
+      margin-bottom: 1em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .icon-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+      padding: 1em 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .icon-bar button {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
       border-radius: 15px;
-      display: inline-block;
+      cursor: pointer;
+      padding: 15px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
     }
-
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      border-radius: 8px;
-      border: none;
+    
+    .icon-bar button:hover, .icon-bar button.active {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
-
-    /* MEMORY CARDS */
-    .memory-grid {
+    
+    .icon-bar button::before {
+      font-size: 24px;
+      display: block;
+      margin-bottom: 5px;
+    }
+    
+    .icon-bar button.memory::before { content: "👁️"; }
+    .icon-bar button.audio::before { content: "👂"; }
+    .icon-bar button.logic::before { content: "🧠"; }
+    
+    .icon-text {
+      font-size: 12px;
+      color: rgba(255,255,255,0.9);
+    }
+    
+    .memory-board {
       display: grid;
-      grid-template-columns: repeat(4, 80px);
-      gap: 10px;
-      justify-content: center;
-      margin-top: 20px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin: 2em auto;
+      max-width: 400px;
     }
-
-    .card-memoria {
-      width: 80px;
-      height: 80px;
-      background-color: #444;
-      font-size: 2rem;
-      color: white;
+    
+    .card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      aspect-ratio: 1;
+      border-radius: 15px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 10px;
+      font-size: 2em;
+      border: 2px solid rgba(255,255,255,0.2);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    
+    .card:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+    }
+    
+    .card.flipped {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      transform: rotateY(180deg);
+    }
+    
+    .card.matched {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+      pointer-events: none;
+    }
+    
+    .game-button {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      padding: 15px 30px;
+      font-size: 1.1em;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .game-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+    
+    .game-button:active {
+      transform: translateY(0);
+    }
+    
+    .input-field {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 15px;
+      color: white;
+      padding: 15px 20px;
+      font-size: 1.1em;
+      margin: 10px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      width: 100%;
+      max-width: 300px;
+    }
+    
+    .input-field::placeholder {
+      color: rgba(255,255,255,0.6);
+    }
+    
+    .input-field:focus {
+      outline: none;
+      border-color: rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.15);
+    }
+    
+    .question-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2em;
+      margin: 1em 0;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .result {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin: 1em 0;
+      padding: 15px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    
+    .result.correct {
+      background: rgba(67, 233, 123, 0.3);
+      border: 2px solid #43e97b;
+    }
+    
+    .result.incorrect {
+      background: rgba(233, 67, 67, 0.3);
+      border: 2px solid #e94343;
+    }
+    
+    .audio-controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      margin: 2em 0;
+    }
+    
+    .sequence-display {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .sequence-item {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    .difficulty-selector {
+      margin: 1em 0;
+    }
+    
+    .difficulty-btn {
+      background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 15px;
+      color: white;
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .difficulty-btn.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-color: rgba(255,255,255,0.5);
+    }
+    
+    .home-screen {
+      display: block;
+      text-align: center;
+      padding: 2em 1em;
+    }
+    
+    .home-screen.hidden {
+      display: none;
+    }
+    
+    .welcome-text {
+      font-size: 1.2em;
+      margin: 2em 0;
+      opacity: 0.9;
+      line-height: 1.6;
+    }
+    
+    .game-preview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin: 2em 0;
+      padding: 0 1em;
+    }
+    
+    .preview-card {
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2em;
+      border: 2px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
       cursor: pointer;
     }
-
-    .card-memoria.flipped {
-      background-color: #00aaff;
+    
+    .preview-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255,255,255,0.15);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    
+    .preview-icon {
+      font-size: 3em;
+      margin-bottom: 0.5em;
+    }
+    
+    .preview-title {
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+    }
+    
+    .preview-desc {
+      opacity: 0.8;
+      font-size: 0.9em;
+    }
+    
+    @media (max-width: 768px) {
+      header {
+        font-size: 1.5em;
+        padding: 1.5em 1em 0.5em;
+      }
+      
+      .memory-board {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 300px;
+      }
+      
+      .stats {
+        gap: 10px;
+      }
+      
+      .stat-card {
+        padding: 10px 15px;
+      }
+      
+      .game-preview {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h1>🧠 Brain Boost</h1>
-  <div id="user-info"></div>
-
-  <div class="menu">
-    <button class="menu-btn" id="btnVisiva">🧠 Visiva</button>
-    <button class="menu-btn" id="btnUditiva">🔊 Uditiva</button>
-    <button class="menu-btn" id="btnLogica">🧩 Logica</button>
-  </div>
-
-  <!-- VISIVA -->
-  <div id="sezioneVisiva" class="section">
-    <div class="card">
-      <h2>Memoria Visiva</h2>
-      <button onclick="iniziaMemory()">Nuovo Memory</button>
-      <div id="grigliaMemory" class="memory-grid"></div>
+  <div id="home" class="home-screen">
+    <header>🧠 Brain Boost</header>
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-number" id="total-games">0</span>
+        <span class="stat-label">Partite</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="best-score">0</span>
+        <span class="stat-label">Record</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="streak">0</span>
+        <span class="stat-label">Serie</span>
+      </div>
+    </div>
+    <div class="welcome-text">
+      Allena la tua mente con giochi divertenti e stimolanti!<br>
+      Scegli una categoria per iniziare.
+    </div>
+    <div class="game-preview">
+      <div class="preview-card" onclick="openGame('visiva')">
+        <div class="preview-icon">👁️</div>
+        <div class="preview-title">Memoria Visiva</div>
+        <div class="preview-desc">Trova le coppie nascoste e allena la tua memoria visiva</div>
+      </div>
+      <div class="preview-card" onclick="openGame('uditiva')">
+        <div class="preview-icon">👂</div>
+        <div class="preview-title">Memoria Uditiva</div>
+        <div class="preview-desc">Riproduci le sequenze sonore che ascolti</div>
+      </div>
+      <div class="preview-card" onclick="openGame('logica')">
+        <div class="preview-icon">🧠</div>
+        <div class="preview-title">Memoria Logica</div>
+        <div class="preview-desc">Risolvi enigmi e problemi di logica</div>
+      </div>
     </div>
   </div>
 
-  <!-- UDITIVA -->
-  <div id="sezioneUditiva" class="section">
-    <div class="card">
-      <h2>Memoria Uditiva</h2>
-      <button onclick="speakNumber()">Ascolta Numero</button>
-      <input type="text" id="inputUdito" placeholder="Scrivi il numero...">
-      <button onclick="controllaNumero()">Controlla</button>
+  <div class="popup" id="popup"></div>
+
+  <div id="visiva" class="game-section">
+    <div class="game-title">🔍 Memoria Visiva</div>
+    <div class="difficulty-selector">
+      <button class="difficulty-btn active" onclick="setDifficulty('easy')">Facile</button>
+      <button class="difficulty-btn" onclick="setDifficulty('medium')">Medio</button>
+      <button class="difficulty-btn" onclick="setDifficulty('hard')">Difficile</button>
+    </div>
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-number" id="moves">0</span>
+        <span class="stat-label">Mosse</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="matches">0</span>
+        <span class="stat-label">Coppie</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="timer">0</span>
+        <span class="stat-label">Tempo</span>
+      </div>
+    </div>
+    <div id="memory-board" class="memory-board"></div>
+    <button class="game-button" onclick="startMemory()">🔄 Nuova Partita</button>
+  </div>
+
+  <div id="uditiva" class="game-section">
+    <div class="game-title">🎵 Memoria Uditiva</div>
+    <div class="audio-controls">
+      <div class="stats">
+        <div class="stat-card">
+          <span class="stat-number" id="audio-level">1</span>
+          <span class="stat-label">Livello</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="audio-score">0</span>
+          <span class="stat-label">Punteggio</span>
+        </div>
+      </div>
+      <div class="sequence-display" id="sequence-display"></div>
+      <button class="game-button" id="play-sequence" onclick="playSequence()">▶️ Ascolta Sequenza</button>
+      <div id="input-buttons" style="display: none;"></div>
+      <button class="game-button" onclick="startAudioGame()">🔄 Nuova Partita</button>
     </div>
   </div>
 
-  <!-- LOGICA -->
-  <div id="sezioneLogica" class="section">
-    <div class="card">
-      <h2>Memoria Logica</h2>
-      <p id="domandaLogica">...</p>
-      <input type="text" id="inputLogica">
-      <button onclick="verificaLogica()">Verifica</button>
+  <div id="logica" class="game-section">
+    <div class="game-title">🧩 Memoria Logica</div>
+    <div class="stats">
+      <div class="stat-card">
+        <span class="stat-number" id="logic-score">0</span>
+        <span class="stat-label">Punteggio</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number" id="logic-level">1</span>
+        <span class="stat-label">Livello</span>
+      </div>
     </div>
+    <div class="question-card">
+      <p id="logic-question">Clicca "Nuova Domanda" per iniziare!</p>
+      <input type="text" id="logic-answer" class="input-field" placeholder="Scrivi la tua risposta...">
+      <br>
+      <button class="game-button" onclick="checkLogic()">✅ Controlla</button>
+      <button class="game-button" onclick="setLogicQuestion()">❓ Nuova Domanda</button>
+    </div>
+    <div id="logic-result" class="result"></div>
+  </div>
+
+  <div class="icon-bar">
+    <button class="memory" onclick="goHome()">
+      <div class="icon-text">🏠 Home</div>
+    </button>
+    <button class="memory" onclick="openGame('visiva')">
+      <div class="icon-text">👁️ Visiva</div>
+    </button>
+    <button class="audio" onclick="openGame('uditiva')">
+      <div class="icon-text">👂 Uditiva</div>
+    </button>
+    <button class="logic" onclick="openGame('logica')">
+      <div class="icon-text">🧠 Logica</div>
+    </button>
   </div>
 
   <script>
-    // Salvataggio nome
-    const username = localStorage.getItem("brainboost-user") || prompt("Benvenuto! Inserisci il tuo nome:");
-    if (!localStorage.getItem("brainboost-user")) {
-      localStorage.setItem("brainboost-user", username);
-      alert("Benvenuto " + username + "!");
-    } else {
-      alert("Bentornato " + username + "!");
+    // Variabili globali
+    let gameStats = {
+      totalGames: 0,
+      bestScore: 0,
+      currentStreak: 0
+    };
+    
+    let currentDifficulty = 'easy';
+    let gameTimer = 0;
+    let timerInterval;
+    
+    // Inizializzazione
+    document.addEventListener('DOMContentLoaded', function() {
+      loadStats();
+      updateStatsDisplay();
+    });
+
+    // Gestione popup migliorata
+    function showPopup(msg, type = 'info') {
+      const popup = document.getElementById("popup");
+      popup.innerHTML = `<div style="font-size: 1.2em; margin-bottom: 0.5em;">${getEmoji(type)}</div><div>${msg}</div>`;
+      popup.className = `popup show ${type}`;
+      setTimeout(() => {
+        popup.classList.remove('show');
+      }, 2500);
     }
-    document.getElementById("user-info").innerText = "Account: " + username;
-
-    // Cambia sezione
-    function mostraSezione(id) {
-      document.querySelectorAll(".section").forEach(sec => sec.classList.remove("active"));
-      document.getElementById(id).classList.add("active");
-      if (id === "sezioneLogica") nuovaDomandaLogica();
-    }
-
-    // Pulsanti
-    document.getElementById("btnVisiva").addEventListener("click", () => mostraSezione("sezioneVisiva"));
-    document.getElementById("btnUditiva").addEventListener("click", () => mostraSezione("sezioneUditiva"));
-    document.getElementById("btnLogica").addEventListener("click", () => mostraSezione("sezioneLogica"));
-
-    // Gioco Uditivo
-    let numeroDaRipetere = "";
-    function speakNumber() {
-      numeroDaRipetere = Math.floor(Math.random() * 9000 + 1000).toString();
-      const msg = new SpeechSynthesisUtterance(numeroDaRipetere);
-      speechSynthesis.speak(msg);
-    }
-
-    function controllaNumero() {
-      const utente = document.getElementById("inputUdito").value;
-      if (utente === numeroDaRipetere) {
-        alert("Bravo! Hai scritto il numero giusto.");
-      } else {
-        alert("Attenzione! Il numero era: " + numeroDaRipetere);
-      }
-      document.getElementById("inputUdito").value = "";
+    
+    function getEmoji(type) {
+      const emojis = {
+        'success': '🎉',
+        'error': '❌',
+        'info': 'ℹ️',
+        'warning': '⚠️'
+      };
+      return emojis[type] || '🎮';
     }
 
-    // Gioco Logico
-    const domandeLogica = [
-      { domanda: "2, 4, 6, ?", risposta: "8" },
-      { domanda: "5, 10, 15, ?", risposta: "20" },
-      { domanda: "1, 4, 9, 16, ?", risposta: "25" },
-      { domanda: "100, 90, 80, ?", risposta: "70" }
-    ];
-    let domandaAttuale = {};
-
-    function nuovaDomandaLogica() {
-      domandaAttuale = domandeLogica[Math.floor(Math.random() * domandeLogica.length)];
-      document.getElementById("domandaLogica").innerText = "Completa: " + domandaAttuale.domanda;
-      document.getElementById("inputLogica").value = "";
-    }
-
-    function verificaLogica() {
-      const risposta = document.getElementById("inputLogica").value.trim();
-      if (risposta === domandaAttuale.risposta) {
-        alert("Corretto! 🔥");
-      } else {
-        alert("Ops, la risposta giusta era " + domandaAttuale.risposta);
-      }
-      nuovaDomandaLogica();
-    }
-
-    // MEMORY
-    let simboli = ["🍎", "🍌", "🍓", "🍇", "🍍", "🥝", "🍉", "🍒"];
-    let carte = [];
-    let primaCarta = null;
-
-    function iniziaMemory() {
-      carte = [...simboli, ...simboli].sort(() => 0.5 - Math.random());
-      const griglia = document.getElementById("grigliaMemory");
-      griglia.innerHTML = "";
-      primaCarta = null;
-
-      carte.forEach((simbolo, i) => {
-        const div = document.createElement("div");
-        div.classList.add("card-memoria");
-        div.dataset.simbolo = simbolo;
-        div.dataset.index = i;
-        div.innerText = "❓";
-        div.onclick = () => giraCarta(div);
-        griglia.appendChild(div);
+    // Navigazione
+    function goHome() {
+      document.querySelectorAll('.game-section').forEach(div => {
+        div.classList.remove('active');
       });
+      document.getElementById('home').classList.remove('hidden');
+      document.querySelectorAll('.icon-bar button').forEach(btn => btn.classList.remove('active'));
+      stopTimer();
     }
 
-    function giraCarta(carta) {
-      if (carta.classList.contains("flipped")) return;
+    function openGame(type) {
+      document.getElementById('home').classList.add('hidden');
+      document.querySelectorAll('.game-section').forEach(div => {
+        div.classList.remove('active');
+      });
+      document.getElementById(type).classList.add('active');
+      
+      // Attiva il pulsante corrispondente
+      document.querySelectorAll('.icon-bar button').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.icon-bar button.${type === 'visiva' ? 'memory' : type === 'uditiva' ? 'audio' : 'logic'}`).classList.add('active');
+      
+      showPopup(`Benvenuto nel gioco di Memoria ${type.charAt(0).toUpperCase() + type.slice(1)}!`, 'info');
+      
+      // Inizializza il gioco specifico
+      if (type === 'visiva') startMemory();
+      if (type === 'logica') setLogicQuestion();
+      if (type === 'uditiva') startAudioGame();
+    }
 
-      carta.innerText = carta.dataset.simbolo;
-      carta.classList.add("flipped");
+    // Sistema statistiche
+    function loadStats() {
+      const saved = JSON.parse(localStorage.getItem('brainBoostStats') || '{}');
+      gameStats = { ...gameStats, ...saved };
+    }
+    
+    function saveStats() {
+      localStorage.setItem('brainBoostStats', JSON.stringify(gameStats));
+    }
+    
+    function updateStatsDisplay() {
+      document.getElementById('total-games').textContent = gameStats.totalGames;
+      document.getElementById('best-score').textContent = gameStats.bestScore;
+      document.getElementById('streak').textContent = gameStats.currentStreak;
+    }
 
-      if (!primaCarta) {
-        primaCarta = carta;
+    // Timer
+    function startTimer() {
+      gameTimer = 0;
+      timerInterval = setInterval(() => {
+        gameTimer++;
+        const timerElement = document.getElementById('timer');
+        if (timerElement) {
+          timerElement.textContent = gameTimer;
+        }
+      }, 1000);
+    }
+    
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    // MEMORIA VISIVA MIGLIORATA
+    const difficulties = {
+      easy: { pairs: 6, icons: ["🐶", "🐱", "🐰", "🐸", "🦊", "🐵"] },
+      medium: { pairs: 8, icons: ["🐶", "🐱", "🐰", "🐸", "🦊", "🐵", "🐺", "🦁"] },
+      hard: { pairs: 12, icons: ["🐶", "🐱", "🐰", "🐸", "🦊", "🐵", "🐺", "🦁", "🐯", "🦝", "🐨", "🐼"] }
+    };
+    
+    let memoryGame = {
+      cards: [],
+      flippedCards: [],
+      matchedPairs: 0,
+      moves: 0,
+      isPlaying: false
+    };
+
+    function setDifficulty(level) {
+      currentDifficulty = level;
+      document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      startMemory();
+    }
+
+    function startMemory() {
+      const config = difficulties[currentDifficulty];
+      const icons = [...config.icons, ...config.icons];
+      
+      memoryGame = {
+        cards: [],
+        flippedCards: [],
+        matchedPairs: 0,
+        moves: 0,
+        isPlaying: true
+      };
+      
+      // Aggiorna visualizzazione
+      document.getElementById('moves').textContent = '0';
+      document.getElementById('matches').textContent = '0';
+      
+      const board = document.getElementById("memory-board");
+      board.innerHTML = "";
+      board.style.gridTemplateColumns = `repeat(${currentDifficulty === 'easy' ? 3 : currentDifficulty === 'medium' ? 4 : 4}, 1fr)`;
+      
+      // Mescola le carte
+      const shuffled = icons.sort(() => 0.5 - Math.random());
+      
+      shuffled.forEach((icon, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.icon = icon;
+        card.dataset.index = index;
+        card.onclick = () => flipCard(card);
+        board.appendChild(card);
+        memoryGame.cards.push(card);
+      });
+      
+      startTimer();
+    }
+
+    function flipCard(card) {
+      if (!memoryGame.isPlaying || card.classList.contains('flipped') || card.classList.contains('matched') || memoryGame.flippedCards.length >= 2) {
+        return;
+      }
+      
+      card.textContent = card.dataset.icon;
+      card.classList.add('flipped');
+      memoryGame.flippedCards.push(card);
+      
+      if (memoryGame.flippedCards.length === 2) {
+        memoryGame.moves++;
+        document.getElementById('moves').textContent = memoryGame.moves;
+        
+        setTimeout(() => {
+          checkMatch();
+        }, 800);
+      }
+    }
+
+    function checkMatch() {
+      const [card1, card2] = memoryGame.flippedCards;
+      
+      if (card1.dataset.icon === card2.dataset.icon) {
+        // Abbinamento trovato
+        card1.classList.add('matched');
+        card2.classList.add('matched');
+        memoryGame.matchedPairs++;
+        document.getElementById('matches').textContent = memoryGame.matchedPairs;
+        
+        // Controlla se il gioco è finito
+        if (memoryGame.matchedPairs === difficulties[currentDifficulty].pairs) {
+          stopTimer();
+          const score = Math.max(1000 - (memoryGame.moves * 10) - (gameTimer * 5), 100);
+          gameStats.totalGames++;
+          if (score > gameStats.bestScore) {
+            gameStats.bestScore = score;
+          }
+          gameStats.currentStreak++;
+          saveStats();
+          updateStatsDisplay();
+          showPopup(`Complimenti! Hai vinto in ${memoryGame.moves} mosse e ${gameTimer} secondi!\nPunteggio: ${score}`, 'success');
+          memoryGame.isPlaying = false;
+        }
       } else {
-        if (primaCarta.dataset.simbolo === carta.dataset.simbolo) {
-          primaCarta = null; // corrette
-        } else {
-          setTimeout(() => {
-            primaCarta.innerText = "❓";
-            primaCarta.classList.remove("flipped");
-            carta.innerText = "❓";
-            carta.classList.remove("flipped");
-            primaCarta = null;
-          }, 800);
+        // Nessun abbinamento
+        card1.textContent = "";
+        card2.textContent = "";
+        card1.classList.remove('flipped');
+        card2.classList.remove('flipped');
+      }
+      
+      memoryGame.flippedCards = [];
+    }
+
+    // MEMORIA UDITIVA MIGLIORATA
+    // MEMORIA UDITIVA CON NUMERI - Sostituire dalla riga ~350 circa
+let audioGame = {
+  sequence: [],
+  playerInput: "",
+  level: 1,
+  score: 0,
+  isPlaying: false,
+  currentNumber: ""
+};
+
+function startAudioGame() {
+  audioGame = {
+    sequence: [],
+    playerInput: "",
+    level: 1,
+    score: 0,
+    isPlaying: false,
+    currentNumber: ""
+  };
+  
+  document.getElementById('audio-level').textContent = '1';
+  document.getElementById('audio-score').textContent = '0';
+  document.getElementById('sequence-display').innerHTML = '';
+  document.getElementById('input-buttons').style.display = 'none';
+  
+  generateNumberSequence();
+}
+
+function generateNumberSequence() {
+  // Genera un numero con tante cifre quanto il livello (min 2, max 8)
+  const digits = Math.max(2, Math.min(8, audioGame.level + 1));
+  audioGame.currentNumber = "";
+  
+  for (let i = 0; i < digits; i++) {
+    audioGame.currentNumber += Math.floor(Math.random() * 10);
+  }
+  
+  audioGame.playerInput = "";
+  showNumberInput();
+}
+
+function playSequence() {
+  if (audioGame.isPlaying) return;
+  
+  audioGame.isPlaying = true;
+  const display = document.getElementById('sequence-display');
+  display.innerHTML = '<div style="font-size: 1.5em; margin: 20px;">🔊 Ascolta il numero...</div>';
+  
+  document.getElementById('play-sequence').disabled = true;
+  
+  // Legge il numero cifra per cifra
+  let index = 0;
+  const speakNext = () => {
+    if (index < audioGame.currentNumber.length) {
+      const digit = audioGame.currentNumber[index];
+      
+      // Mostra la cifra temporaneamente
+      display.innerHTML = `<div style="font-size: 3em; color: #4facfe; margin: 20px; text-shadow: 0 0 20px rgba(79,172,254,0.5);">${digit}</div>`;
+      
+      // Sintesi vocale (se supportata)
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(digit);
+        utterance.rate = 0.8;
+        utterance.pitch = 1.2;
+        speechSynthesis.speak(utterance);
+      }
+      
+      index++;
+      setTimeout(() => {
+        display.innerHTML = '<div style="font-size: 1.2em; opacity: 0.7;">🎵 Ascoltando...</div>';
+        setTimeout(speakNext, 800);
+      }, 600);
+    } else {
+      setTimeout(() => {
+        display.innerHTML = '<div style="font-size: 1.2em;">✍️ Ora scrivi il numero che hai sentito!</div>';
+        setupNumberInput();
+        audioGame.isPlaying = false;
+        document.getElementById('play-sequence').disabled = false;
+      }, 1000);
+    }
+  };
+  
+  speakNext();
+}
+
+function setupNumberInput() {
+  const inputDiv = document.getElementById('input-buttons');
+  inputDiv.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 15px;">
+      <input type="text" id="number-input" class="input-field" 
+             placeholder="Scrivi il numero qui..." 
+             style="font-size: 1.5em; text-align: center; max-width: 200px;">
+      <button class="game-button" onclick="checkNumber()">✅ Controlla</button>
+      <div style="font-size: 0.9em; opacity: 0.8;">
+        Livello ${audioGame.level} - ${audioGame.currentNumber.length} cifre
+      </div>
+    </div>
+  `;
+  inputDiv.style.display = 'block';
+  
+  // Focus sull'input
+  setTimeout(() => {
+    document.getElementById('number-input').focus();
+  }, 100);
+  
+  // Gestione Enter
+  document.getElementById('number-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      checkNumber();
+    }
+  });
+}
+
+function checkNumber() {
+  const userInput = document.getElementById('number-input').value.trim();
+  const display = document.getElementById('sequence-display');
+  
+  if (!userInput) {
+    showPopup('Inserisci un numero!', 'warning');
+    return;
+  }
+  
+  if (userInput === audioGame.currentNumber) {
+    // Risposta corretta
+    audioGame.level++;
+    audioGame.score += audioGame.level * 10;
+    
+    document.getElementById('audio-level').textContent = audioGame.level;
+    document.getElementById('audio-score').textContent = audioGame.score;
+    
+    display.innerHTML = `
+      <div style="color: #43e97b; font-size: 1.5em; margin: 20px;">
+        ✅ Corretto!<br>
+        <div style="font-size: 0.8em; margin-top: 10px;">
+          Numero era: ${audioGame.currentNumber}<br>
+          +${audioGame.level * 10} punti
+        </div>
+      </div>
+    `;
+    
+    showPopup(`Corretto! Livello ${audioGame.level}`, 'success');
+    
+    // Aggiorna statistiche
+    gameStats.currentStreak++;
+    if (audioGame.score > gameStats.bestScore) {
+      gameStats.bestScore = audioGame.score;
+    }
+    saveStats();
+    updateStatsDisplay();
+    
+    setTimeout(() => {
+      generateNumberSequence();
+    }, 2500);
+    
+  } else {
+    // Risposta sbagliata
+    if (audioGame.level > 1) {
+      audioGame.level--;
+    }
+    
+    document.getElementById('audio-level').textContent = audioGame.level;
+    
+    display.innerHTML = `
+      <div style="color: #e94343; font-size: 1.5em; margin: 20px;">
+        ❌ Sbagliato!<br>
+        <div style="font-size: 0.8em; margin-top: 10px;">
+          Numero era: <strong>${audioGame.currentNumber}</strong><br>
+          Hai scritto: <strong>${userInput}</strong><br>
+          Livello ridotto a ${audioGame.level}
+        </div>
+      </div>
+    `;
+    
+    showPopup('Sbagliato! Livello ridotto', 'error');
+    
+    gameStats.currentStreak = 0;
+    saveStats();
+    updateStatsDisplay();
+    
+    setTimeout(() => {
+      generateNumberSequence();
+    }, 3000);
+  }
+  
+  document.getElementById('input-buttons').style.display = 'none';
+}
+
+function showNumberInput() {
+  const display = document.getElementById('sequence-display');
+  display.innerHTML = `
+    <div style="text-align: center;">
+      <div style="font-size: 1.3em; margin-bottom: 15px;">
+        🎯 Livello ${audioGame.level}
+      </div>
+      <div style="font-size: 1em; opacity: 0.8; margin-bottom: 20px;">
+        Memorizzerai un numero di ${audioGame.currentNumber.length} cifre
+      </div>
+      <button class="game-button" onclick="playSequence()">
+        🔊 Ascolta il Numero
+      </button>
+    </div>
+  `;
+  
+  document.getElementById('input-buttons').style.display = 'none';
+  document.getElementById('play-sequence').style.display = 'none';
+}
+
+    // MEMORIA LOGICA MIGLIORATA
+  // MEMORIA LOGICA ESTESA - Sostituire dalla riga ~500 circa (dove inizia la sezione logica)
+
+// Generatori di domande dinamiche per ogni livello
+const logicGenerators = {
+  // LIVELLO 1 - Matematica di base e logica semplice (100+ variazioni)
+  level1: [
+    // Addizioni semplici
+    () => {
+      const a = Math.floor(Math.random() * 10) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      return { q: `Quanto fa ${a} + ${b}?`, a: (a + b).toString(), points: 10 };
+    },
+    // Sottrazioni
+    () => {
+      const a = Math.floor(Math.random() * 15) + 5;
+      const b = Math.floor(Math.random() * a);
+      return { q: `Quanto fa ${a} - ${b}?`, a: (a - b).toString(), points: 10 };
+    },
+    // Moltiplicazioni semplici
+    () => {
+      const a = Math.floor(Math.random() * 10) + 1;
+      const b = Math.floor(Math.random() * 10) + 1;
+      return { q: `Quanto fa ${a} × ${b}?`, a: (a * b).toString(), points: 10 };
+    },
+    // Divisioni
+    () => {
+      const b = Math.floor(Math.random() * 9) + 2;
+      const result = Math.floor(Math.random() * 10) + 1;
+      const a = b * result;
+      return { q: `Quanto fa ${a} ÷ ${b}?`, a: result.toString(), points: 10 };
+    },
+    // Giorni della settimana
+    () => {
+      const giorni = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
+      const oggi = Math.floor(Math.random() * 7);
+      const domani = (oggi + 1) % 7;
+      return { q: `Se oggi è ${giorni[oggi]}, che giorno sarà domani?`, a: giorni[domani], points: 10 };
+    },
+    // Mesi dell'anno
+    () => {
+      const mesi = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 
+                   'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+      const questo = Math.floor(Math.random() * 12);
+      const prossimo = (questo + 1) % 12;
+      return { q: `Se siamo in ${mesi[questo]}, qual è il mese successivo?`, a: mesi[prossimo], points: 10 };
+    },
+    // Contrari
+    () => {
+      const contrari = [
+        ['caldo', 'freddo'], ['grande', 'piccolo'], ['alto', 'basso'], ['veloce', 'lento'],
+        ['buono', 'cattivo'], ['forte', 'debole'], ['pieno', 'vuoto'], ['lungo', 'corto'],
+        ['nuovo', 'vecchio'], ['pulito', 'sporco'], ['ricco', 'povero'], ['felice', 'triste']
+      ];
+      const coppia = contrari[Math.floor(Math.random() * contrari.length)];
+      const ordine = Math.random() > 0.5;
+      return { 
+        q: `Qual è il contrario di '${ordine ? coppia[0] : coppia[1]}'?`, 
+        a: ordine ? coppia[1] : coppia[0], 
+        points: 10 
+      };
+    },
+    // Numeri di animali
+    () => {
+      const animali = [
+        ['gatto', '4'], ['cane', '4'], ['ragno', '8'], ['uccello', '2'],
+        ['mucca', '4'], ['cavallo', '4'], ['pollo', '2'], ['pesce', '0'],
+        ['serpente', '0'], ['elefante', '4']
+      ];
+      const animale = animali[Math.floor(Math.random() * animali.length)];
+      return { q: `Quante zampe ha un ${animale[0]}?`, a: animale[1], points: 10 };
+    },
+    // Colori primari
+    () => {
+      const colori = [
+        ['rosso + blu', 'viola'], ['rosso + giallo', 'arancione'], ['blu + giallo', 'verde']
+      ];
+      const mix = colori[Math.floor(Math.random() * colori.length)];
+      return { q: `Che colore si ottiene mescolando ${mix[0]}?`, a: mix[1], points: 10 };
+    },
+    // Numeri in sequenza
+    () => {
+      const start = Math.floor(Math.random() * 20) + 1;
+      return { q: `Quale numero viene dopo: ${start}, ${start+1}, ${start+2}, ?`, a: (start+3).toString(), points: 10 };
+    }
+  ],
+
+  // LIVELLO 2 - Matematica intermedia e logica (100+ variazioni)
+  level2: [
+    // Sequenze numeriche
+    () => {
+      const start = Math.floor(Math.random() * 10) + 1;
+      const step = Math.floor(Math.random() * 5) + 2;
+      const seq = [start, start + step, start + (step * 2), start + (step * 3)];
+      return { q: `Completa la sequenza: ${seq.join(', ')}, ?`, a: (start + (step * 4)).toString(), points: 20 };
+    },
+    // Fibonacci
+    () => {
+      const variations = [
+        [[1, 1, 2, 3, 5], '8'],
+        [[2, 2, 4, 6, 10], '16'],
+        [[3, 3, 6, 9, 15], '24'],
+        [[1, 2, 3, 5, 8], '13']
+      ];
+      const seq = variations[Math.floor(Math.random() * variations.length)];
+      return { q: `Quale numero segue: ${seq[0].join(', ')}, ?`, a: seq[1], points: 20 };
+    },
+    // Problemi di età
+    () => {
+      const annaAge = Math.floor(Math.random() * 30) + 20;
+      const diff = Math.floor(Math.random() * 10) + 1;
+      const marcoAge = annaAge + diff;
+      return { q: `Se Marco ha ${diff} anni più di Anna e Anna ha ${annaAge} anni, quanti anni ha Marco?`, a: marcoAge.toString(), points: 20 };
+    },
+    // Problemi di tempo
+    () => {
+      const startHour = Math.floor(Math.random() * 12) + 8;
+      const startMin = Math.floor(Math.random() * 4) * 15;
+      const duration = Math.floor(Math.random() * 4) + 1;
+      const durationMin = Math.floor(Math.random() * 4) * 15;
+      
+      const endHour = startHour + duration;
+      const endMin = startMin + durationMin;
+      
+      const startTime = `${startHour}:${startMin.toString().padStart(2, '0')}`;
+      const endTime = `${endHour}:${endMin.toString().padStart(2, '0')}`;
+      const durationText = `${duration} ore${durationMin > 0 ? ` e ${durationMin} minuti` : ''}`;
+      
+      return { q: `Se un evento inizia alle ${startTime} e finisce alle ${endTime}, quanto dura?`, a: durationText, points: 20 };
+    },
+    // Problemi di proporzioni
+    () => {
+      const base = Math.floor(Math.random() * 5) + 2;
+      const mult1 = Math.floor(Math.random() * 5) + 2;
+      const mult2 = Math.floor(Math.random() * 5) + 2;
+      const price1 = base * mult1;
+      const quantity2 = base * mult2;
+      const price2 = price1 * mult2 / mult1;
+      
+      return { q: `Se ${base * mult1} mele costano ${price1} euro, quanto costano ${quantity2} mele?`, a: price2.toString(), points: 20 };
+    },
+    // Logica con numeri
+    () => {
+      const patterns = [
+        [[2, 4, 8, 16], '32'], // potenze di 2
+        [[3, 6, 12, 24], '48'], // moltiplicare per 2
+        [[1, 4, 9, 16], '25'], // quadrati perfetti
+        [[5, 10, 20, 40], '80'], // moltiplicare per 2
+        [[1, 3, 9, 27], '81'] // potenze di 3
+      ];
+      const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+      return { q: `Continua la sequenza: ${pattern[0].join(', ')}, ?`, a: pattern[1], points: 20 };
+    },
+    // Problemi di logica verbale
+    () => {
+      const scenarios = [
+        ['Tutti i gatti sono mammiferi. Tutti i mammiferi sono animali. Quindi tutti i gatti sono...?', 'animali'],
+        ['Alcuni fiori sono rossi. Tutte le rose sono fiori. Quindi alcune rose sono...?', 'rosse'],
+        ['Nessun pesce vola. Tutti gli uccelli volano. Quindi nessun pesce è...?', 'uccello'],
+        ['Tutti i libri hanno pagine. Questa rivista ha pagine. Quindi questa rivista è come...?', 'libro']
+      ];
+      const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+      return { q: scenario[0], a: scenario[1], points: 20 };
+    },
+    // Calcoli con percentuali semplici
+    () => {
+      const base = Math.floor(Math.random() * 10) * 10 + 50;
+      const percent = [10, 20, 25, 50][Math.floor(Math.random() * 4)];
+      const result = (base * percent) / 100;
+      return { q: `Quanto è il ${percent}% di ${base}?`, a: result.toString(), points: 20 };
+    }
+  ],
+
+  // LIVELLO 3 - Logica avanzata e problemi complessi (100+ variazioni)
+  level3: [
+    // Problemi logici classici
+    () => {
+      const problems = [
+        ['In una stanza ci sono 4 angoli. In ogni angolo c\'è un gatto. Davanti a ogni gatto ci sono 3 gatti. Quanti gatti ci sono in totale?', '4'],
+        ['Un contadino ha 17 pecore. Tutte tranne 9 muoiono. Quante pecore rimangono?', '9'],
+        ['Se dovessi mettere una moneda in una bottiglia vuota e poi inserire un tappo, come tireresti fuori la moneda senza rompere la bottiglia?', 'spingere il tappo dentro'],
+        ['Un aereo si schianta esattamente sul confine tra Italia e Francia. Dove vengono sepolti i sopravvissuti?', 'da nessuna parte'],
+        ['Quanto pesa un mattone se pesa un chilo più mezzo mattone?', '2 chili']
+      ];
+      return problems[Math.floor(Math.random() * problems.length)];
+    },
+    // Sequenze complesse
+    () => {
+      const sequences = [
+        [[1, 4, 9, 16, 25], '36'], // quadrati perfetti
+        [[2, 6, 12, 20, 30], '42'], // n(n+1)
+        [[1, 8, 27, 64, 125], '216'], // cubi
+        [[3, 7, 15, 31, 63], '127'], // 2^n - 1 + 2
+        [[5, 11, 23, 47, 95], '191'] // 2n + 1
+      ];
+      const seq = sequences[Math.floor(Math.random() * sequences.length)];
+      return { q: `Quale numero segue nella sequenza: ${seq[0].join(', ')}, ?`, a: seq[1], points: 30 };
+    },
+    // Problemi di logica deduttiva
+    () => {
+      const deductions = [
+        ['Se tutti i Bloops sono Razzies e tutti i Razzies sono Lazzies, allora tutti i Bloops sono...?', 'lazzies'],
+        ['Se nessun Floop è Gloop e tutti i Hloops sono Floops, allora nessun Hloop è...?', 'gloop'],
+        ['Se alcuni Croops sono Droops e tutti i Droops sono Eroops, allora alcuni Croops sono...?', 'eroops'],
+        ['Se tutti i Vroops sono Wroops e nessun Wroop è Xroop, allora nessun Vroop è...?', 'xroop']
+      ];
+      return deductions[Math.floor(Math.random() * deductions.length)];
+    },
+    // Problemi matematici complessi
+    () => {
+      const complex = [
+        ['Se un treno lungo 100 metri viaggia a 60 km/h e attraversa un tunnel lungo 200 metri, quanto tempo impiega?', '18 secondi'],
+        ['In un gruppo di 30 persone, 18 parlano inglese, 15 parlano francese, 6 parlano entrambe. Quante non parlano nessuna delle due?', '3'],
+        ['Un orologio suona ogni ora tante volte quante ne indica. Quante volte suona in 12 ore?', '78'],
+        ['Se oggi fosse domani, dopodomani sarebbe domenica. Che giorno è oggi?', 'venerdì']
+      ];
+      return complex[Math.floor(Math.random() * complex.length)];
+    },
+    // Enigmi numerici
+    () => {
+      const riddles = [
+        ['Sono un numero di 3 cifre. La somma delle mie cifre è 15. La mia cifra delle centinaia è il doppio di quella delle unità. Sono divisibile per 3. Chi sono?', '642'],
+        ['Pensate a un numero, moltiplicatelo per 2, aggiungete 10, dividete per 2, sottraete il numero di partenza. Che risultato ottenete?', '5'],
+        ['Se 2 = 6, 3 = 12, 4 = 20, 5 = 30, quanto fa 6?', '42'],
+        ['Sono un numero che se mi leggi al contrario resto uguale. La somma delle mie cifre è 18. Ho 4 cifre. Chi sono?', '9009']
+      ];
+      return riddles[Math.floor(Math.random() * riddles.length)];
+    },
+    // Problemi di geometria mentale
+    () => {
+      const geometry = [
+        ['Quanti triangoli ci sono in una stella a 5 punte?', '10'],
+        ['Se piego un foglio a metà 3 volte e faccio un buco, quanti buchi ci saranno quando lo riapro?', '8'],
+        ['Quanti cubi ci sono in una costruzione 3x3x3 a cui è stato tolto il cubo centrale?', '26'],
+        ['In quanti modi diversi posso colorare un cubo con 3 colori usando ogni colore almeno una volta?', '246']
+      ];
+      return geometry[Math.floor(Math.random() * geometry.length)];
+    }
+  ]
+};
+
+// Sistema principale della memoria logica
+let logicGame = {
+  currentQuestion: null,
+  score: 0,
+  level: 1,
+  questionsAnswered: 0,
+  correctInLevel: 0,
+  usedQuestions: new Set() // Per evitare ripetizioni immediate
+};
+
+function generateLogicQuestion() {
+  const generators = logicGenerators[`level${logicGame.level}`];
+  if (!generators) {
+    showPopup('Livello non disponibile!', 'error');
+    return null;
+  }
+  
+  let attempts = 0;
+  let question = null;
+  
+  // Prova a generare una domanda non utilizzata di recente
+  do {
+    const generator = generators[Math.floor(Math.random() * generators.length)];
+    question = typeof generator === 'function' ? generator() : { q: generator[0], a: generator[1], points: 30 };
+    attempts++;
+  } while (logicGame.usedQuestions.has(question.q) && attempts < 10);
+  
+  // Aggiungi la domanda alle usate (mantieni solo le ultime 20)
+  logicGame.usedQuestions.add(question.q);
+  if (logicGame.usedQuestions.size > 20) {
+    const firstQuestion = logicGame.usedQuestions.values().next().value;
+    logicGame.usedQuestions.delete(firstQuestion);
+  }
+  
+  return question;
+}
+
+function setLogicQuestion() {
+  logicGame.currentQuestion = generateLogicQuestion();
+  
+  if (!logicGame.currentQuestion) {
+    showPopup('Errore nella generazione della domanda!', 'error');
+    return;
+  }
+  
+  document.getElementById("logic-question").textContent = logicGame.currentQuestion.q;
+  document.getElementById("logic-answer").value = "";
+  document.getElementById("logic-result").textContent = "";
+  document.getElementById("logic-result").className = "result";
+  
+  // Aggiorna display
+  document.getElementById('logic-score').textContent = logicGame.score;
+  document.getElementById('logic-level').textContent = logicGame.level;
+  
+  // Mostra progresso nel livello
+  const progress = document.getElementById('logic-progress');
+  if (progress) {
+    const questionsNeeded = getQuestionsNeededForLevel(logicGame.level);
+    progress.textContent = `${logicGame.correctInLevel}/${questionsNeeded}`;
+  }
+}
+
+function getQuestionsNeededForLevel(level) {
+  // Numero di domande corrette necessarie per passare al livello successivo
+  switch(level) {
+    case 1: return 10;
+    case 2: return 15;
+    case 3: return 20;
+    default: return 25;
+  }
+}
+
+function checkLogic() {
+  if (!logicGame.currentQuestion) {
+    showPopup('Prima seleziona una domanda!', 'warning');
+    return;
+  }
+  
+  const userAnswer = document.getElementById("logic-answer").value.trim().toLowerCase();
+  const correctAnswers = Array.isArray(logicGame.currentQuestion.a) 
+    ? logicGame.currentQuestion.a.map(a => a.toLowerCase())
+    : [logicGame.currentQuestion.a.toLowerCase()];
+  
+  const result = document.getElementById("logic-result");
+  const isCorrect = correctAnswers.some(answer => {
+    // Controllo flessibile della risposta
+    return userAnswer === answer || 
+           userAnswer.includes(answer) || 
+           answer.includes(userAnswer) ||
+           // Per numeri, controllo anche senza spazi
+           userAnswer.replace(/\s/g, '') === answer.replace(/\s/g, '');
+  });
+  
+  if (isCorrect) {
+    result.textContent = `✅ Corretto! +${logicGame.currentQuestion.points} punti`;
+    result.className = "result correct";
+    logicGame.score += logicGame.currentQuestion.points;
+    logicGame.questionsAnswered++;
+    logicGame.correctInLevel++;
+    
+    // Controlla se può passare al livello successivo
+    const questionsNeeded = getQuestionsNeededForLevel(logicGame.level);
+    if (logicGame.correctInLevel >= questionsNeeded && logicGame.level < 3) {
+      logicGame.level++;
+      logicGame.correctInLevel = 0;
+      logicGame.usedQuestions.clear(); // Reset domande usate per il nuovo livello
+      showPopup(`🎉 Livello ${logicGame.level} sbloccato! Difficoltà aumentata!`, 'success');
+    }
+    
+    // Aggiorna statistiche globali
+    gameStats.currentStreak++;
+    if (logicGame.score > gameStats.bestScore) {
+      gameStats.bestScore = logicGame.score;
+    }
+    gameStats.totalGames++;
+    saveStats();
+    updateStatsDisplay();
+    
+    // Genera automaticamente la prossima domanda dopo 2 secondi
+    setTimeout(() => {
+      setLogicQuestion();
+    }, 2000);
+    
+  } else {
+    result.textContent = `❌ Sbagliato! La risposta corretta era: ${Array.isArray(logicGame.currentQuestion.a) ? logicGame.currentQuestion.a[0] : logicGame.currentQuestion.a}`;
+    result.className = "result incorrect";
+    
+    // Penali per risposta sbagliata
+    if (logicGame.score > 0) {
+      logicGame.score = Math.max(0, logicGame.score - 5);
+    }
+    if (logicGame.correctInLevel > 0) {
+      logicGame.correctInLevel--;
+    }
+    
+    gameStats.currentStreak = 0;
+    saveStats();
+    updateStatsDisplay();
+  }
+  
+  // Aggiorna tutti i display
+  document.getElementById('logic-score').textContent = logicGame.score;
+  document.getElementById('logic-level').textContent = logicGame.level;
+}
+
+// Funzione per inizializzare/reset del gioco logico
+function startLogicGame() {
+  logicGame = {
+    currentQuestion: null,
+    score: 0,
+    level: 1,
+    questionsAnswered: 0,
+    correctInLevel: 0,
+    usedQuestions: new Set()
+  };
+  
+  document.getElementById('logic-score').textContent = '0';
+  document.getElementById('logic-level').textContent = '1';
+  
+  setLogicQuestion();
+  showPopup('Nuovo gioco di Memoria Logica iniziato!', 'info');
+}
+
+// Gestione input con Enter per la logica
+document.addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    const activeSection = document.querySelector('.game-section.active');
+    if (activeSection && activeSection.id === 'logica') {
+      const answerField = document.getElementById('logic-answer');
+      if (document.activeElement === answerField) {
+        checkLogic();
+      }
+    }
+  }
+});
+
+// Sistema di suggerimenti per domande difficili
+function showHint() {
+  if (!logicGame.currentQuestion) return;
+  
+  const hints = {
+    'In una stanza ci sono 4 angoli': 'Pensa: ogni gatto vede gli altri 3...',
+    'Un contadino ha 17 pecore': 'Se tutte tranne 9 muoiono, quante sono vive?',
+    'bottiglia vuota': 'Non devi tirare fuori la moneta, ma...',
+    'sopravvissuti': 'I sopravvissuti sono vivi!',
+    'mattone': 'Se x = peso del mattone, allora x = 1 + x/2'
+  };
+  
+  for (let key in hints) {
+    if (logicGame.currentQuestion.q.includes(key)) {
+      showPopup(`💡 Suggerimento: ${hints[key]}`, 'info');
+      return;
+    }
+  }
+  
+  showPopup('💡 Leggi attentamente la domanda e pensa fuori dagli schemi!', 'info');
+}
+    // Gestione input con Enter
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const activeSection = document.querySelector('.game-section.active');
+        if (activeSection && activeSection.id === 'logica') {
+          checkLogic();
         }
       }
-    }
-  </script>
+    });
 
+    // Effetti sonori con Web Audio API
+    function playSuccessSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+      oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    }
+
+    function playErrorSound() {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+      oscillator.frequency.setValueAtTime(150, audioContext.currentTime + 0.1);
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.2);
+    }
+
+    // Migliora i feedback con suoni
+    const originalShowPopup = showPopup;
+    showPopup = function(msg, type = 'info') {
+      originalShowPopup(msg, type);
+      
+      try {
+        if (type === 'success') {
+          playSuccessSound();
+        } else if (type === 'error') {
+          playErrorSound();
+        }
+      } catch (e) {
+        // Ignora errori audio se non supportato
+      }
+    };
+
+    // Animazioni avanzate
+    function addRippleEffect(element, event) {
+      const ripple = document.createElement('span');
+      const rect = element.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = event.clientX - rect.left - size / 2;
+      const y = event.clientY - rect.top - size / 2;
+      
+      ripple.style.width = ripple.style.height = size + 'px';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      ripple.classList.add('ripple');
+      
+      element.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    }
+
+    // Aggiungi CSS per l'effetto ripple
+    const rippleCSS = `
+      .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.6);
+        transform: scale(0);
+        animation: ripple-animation 0.6s linear;
+        pointer-events: none;
+      }
+      
+      @keyframes ripple-animation {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+      
+      .game-button, .card, .preview-card {
+        position: relative;
+        overflow: hidden;
+      }
+    `;
+    
+    const style = document.createElement('style');
+    style.textContent = rippleCSS;
+    document.head.appendChild(style);
+
+    // Aggiungi effetto ripple ai pulsanti
+    document.addEventListener('click', function(e) {
+      if (e.target.matches('.game-button, .card, .preview-card')) {
+        addRippleEffect(e.target, e);
+      }
+    });
+
+    // Sistema di achievement
+    const achievements = [
+      { id: 'first_win', name: 'Prima Vittoria', desc: 'Vinci la tua prima partita', icon: '🏆' },
+      { id: 'memory_master', name: 'Maestro della Memoria', desc: 'Completa una partita di memoria in meno di 20 mosse', icon: '🧠' },
+      { id: 'speed_runner', name: 'Corridore Veloce', desc: 'Completa una partita di memoria in meno di 60 secondi', icon: '⚡' },
+      { id: 'logic_genius', name: 'Genio della Logica', desc: 'Raggiungi 100 punti nel gioco logico', icon: '🎓' },
+      { id: 'audio_ace', name: 'Asso dell\'Audio', desc: 'Raggiungi il livello 10 nel gioco audio', icon: '🎵' },
+      { id: 'streak_master', name: 'Maestro delle Serie', desc: 'Ottieni una serie di 10 vittorie consecutive', icon: '🔥' }
+    ];
+
+    let unlockedAchievements = JSON.parse(localStorage.getItem('brainBoostAchievements') || '[]');
+
+    function checkAchievements(gameType, stats) {
+      const newAchievements = [];
+      
+      // Controlla achievement basati sui risultati
+      if (gameType === 'memory' && stats.moves < 20 && !unlockedAchievements.includes('memory_master')) {
+        newAchievements.push('memory_master');
+      }
+      
+      if (gameType === 'memory' && stats.time < 60 && !unlockedAchievements.includes('speed_runner')) {
+        newAchievements.push('speed_runner');
+      }
+      
+      if (gameType === 'logic' && stats.score >= 100 && !unlockedAchievements.includes('logic_genius')) {
+        newAchievements.push('logic_genius');
+      }
+      
+      if (gameType === 'audio' && stats.level >= 10 && !unlockedAchievements.includes('audio_ace')) {
+        newAchievements.push('audio_ace');
+      }
+      
+      if (gameStats.currentStreak >= 10 && !unlockedAchievements.includes('streak_master')) {
+        newAchievements.push('streak_master');
+      }
+      
+      if (gameStats.totalGames === 1 && !unlockedAchievements.includes('first_win')) {
+        newAchievements.push('first_win');
+      }
+      
+      // Mostra nuovi achievement
+      newAchievements.forEach(achievementId => {
+        const achievement = achievements.find(a => a.id === achievementId);
+        if (achievement) {
+          unlockedAchievements.push(achievementId);
+          showPopup(`${achievement.icon} Achievement Sbloccato!\n${achievement.name}\n${achievement.desc}`, 'success');
+        }
+      });
+      
+      if (newAchievements.length > 0) {
+        localStorage.setItem('brainBoostAchievements', JSON.stringify(unlockedAchievements));
+      }
+    }
+
+    // Integra il sistema di achievement nei giochi esistenti
+    const originalCheckMatch = checkMatch;
+    checkMatch = function() {
+      originalCheckMatch();
+      
+      if (memoryGame.matchedPairs === difficulties[currentDifficulty].pairs) {
+        checkAchievements('memory', { moves: memoryGame.moves, time: gameTimer });
+      }
+    };
+
+    const originalCheckLogic = checkLogic;
+    checkLogic = function() {
+      originalCheckLogic();
+      
+      if (logicGame.score > 0) {
+        checkAchievements('logic', { score: logicGame.score });
+      }
+    };
+
+    const originalInputSound = inputSound;
+    inputSound = function(soundIndex) {
+      originalInputSound(soundIndex);
+      
+      if (audioGame.level > 1) {
+        checkAchievements('audio', { level: audioGame.level });
+      }
+    };
+  </script>
 </body>
 </html>
