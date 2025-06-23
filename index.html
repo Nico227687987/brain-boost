@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -53,6 +52,7 @@
             background-color: var(--card-color);
             padding: 15px 0;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
         }
 
         .header-content {
@@ -74,6 +74,198 @@
         .logo-icon {
             margin-right: 10px;
             font-size: 2rem;
+        }
+
+        /* AUTH */
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auth-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .login-btn {
+            background: none;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .login-btn:hover {
+            background: rgba(187, 134, 252, 0.1);
+        }
+
+        .register-btn {
+            background: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            color: #000;
+        }
+
+        .register-btn:hover {
+            background: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: var(--card-color);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            padding: 10px 0;
+            width: 200px;
+            z-index: 100;
+            display: none;
+        }
+
+        .user-menu.show {
+            display: block;
+        }
+
+        .user-menu-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .user-menu-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            background: var(--card-color);
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: var(--accent-secondary);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+        }
+
+        .form-link {
+            color: var(--accent-color);
+            cursor: pointer;
+            text-decoration: none;
         }
 
         /* GAME AREA */
@@ -277,6 +469,37 @@
             margin-bottom: 5px;
         }
 
+        /* LEADERBOARD */
+        .leaderboard {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .leaderboard th, .leaderboard td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .leaderboard th {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .leaderboard tr:last-child td {
+            border-bottom: none;
+        }
+
+        .leaderboard tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .user-rank {
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
         /* ANIMATIONS */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -376,6 +599,15 @@
                 font-size: 1.2rem;
                 padding: 12px 15px;
             }
+            
+            .auth-buttons {
+                gap: 5px;
+            }
+            
+            .auth-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -387,6 +619,24 @@
                     <span class="logo-icon">🧠</span>
                     <span>Ultimate Brain</span>
                 </a>
+                
+                <div id="authSection">
+                    <div class="auth-buttons">
+                        <button class="auth-btn login-btn" id="loginBtn">Accedi</button>
+                        <button class="auth-btn register-btn" id="registerBtn">Registrati</button>
+                    </div>
+                </div>
+                
+                <div id="userSection" class="hidden">
+                    <div class="user-profile" id="userProfile">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-menu-item" onclick="showProfile()">Profilo</div>
+                            <div class="user-menu-item" onclick="showLeaderboard()">Classifica</div>
+                            <div class="user-menu-item" onclick="logout()">Esci</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -443,6 +693,142 @@
                 <span>Arte</span>
             </a>
         </nav>
+    </div>
+
+    <!-- MODAL LOGIN -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Accedi</h3>
+                <button class="close-modal" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="loginPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Accedi</button>
+            </form>
+            <div class="form-footer">
+                Non hai un account? <a class="form-link" onclick="showRegisterModal()">Registrati</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL REGISTRAZIONE -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Registrati</h3>
+                <button class="close-modal" onclick="closeModal('registerModal')">&times;</button>
+            </div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label class="form-label">Nome</label>
+                    <input type="text" class="form-input" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="registerPassword" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Conferma Password</label>
+                    <input type="password" class="form-input" id="registerConfirmPassword" required>
+                </div>
+                <button type="submit" class="submit-btn">Registrati</button>
+            </form>
+            <div class="form-footer">
+                Hai già un account? <a class="form-link" onclick="showLoginModal()">Accedi</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PROFILO -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Profilo</h3>
+                <button class="close-modal" onclick="closeModal('profileModal')">&times;</button>
+            </div>
+            <div class="profile-content">
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 30px;">
+                    <div class="user-avatar big" id="profileAvatar" style="width: 80px; height: 80px; font-size: 2rem;"></div>
+                    <div>
+                        <h3 id="profileName"></h3>
+                        <p id="profileEmail" style="color: var(--text-secondary);"></p>
+                    </div>
+                </div>
+                
+                <h4 style="margin-bottom: 15px;">Statistiche</h4>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 30px;">
+                    <div class="stat-card">
+                        <div class="stat-label">Punteggio massimo</div>
+                        <div class="stat-value" id="profileHighScore">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Livello massimo</div>
+                        <div class="stat-value" id="profileMaxLevel">1</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Partite giocate</div>
+                        <div class="stat-value" id="profileGamesPlayed">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Precisione media</div>
+                        <div class="stat-value" id="profileAccuracy">0%</div>
+                    </div>
+                </div>
+                
+                <h4 style="margin-bottom: 15px;">Progressi</h4>
+                <div id="profileProgress">
+                    <!-- Progressi per categoria verranno aggiunti dinamicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CLASSIFICA -->
+    <div class="modal" id="leaderboardModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Classifica Globale</h3>
+                <button class="close-modal" onclick="closeModal('leaderboardModal')">&times;</button>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <select id="leaderboardFilter" class="form-input" onchange="updateLeaderboard()">
+                    <option value="all">Tutte le categorie</option>
+                    <option value="visual">Memoria Visiva</option>
+                    <option value="audio">Memoria Uditiva</option>
+                    <option value="logic">Logica</option>
+                    <option value="math">Matematica</option>
+                    <option value="geo">Geografia</option>
+                    <option value="art">Arte</option>
+                </select>
+            </div>
+            <div style="max-height: 400px; overflow-y: auto;">
+                <table class="leaderboard" id="leaderboardTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Giocatore</th>
+                            <th>Punteggio</th>
+                            <th>Livello</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <!-- Dati classifica verranno aggiunti dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -558,6 +944,27 @@
             memoryPairs: [],
             memoryMatched: 0,
             flippedCards: []
+        };
+
+        // STATO UTENTE
+        const userState = {
+            loggedIn: false,
+            id: null,
+            name: "",
+            email: "",
+            highScore: 0,
+            maxLevel: 1,
+            gamesPlayed: 0,
+            totalCorrect: 0,
+            totalQuestions: 0,
+            progress: {
+                visual: { completed: 0, highScore: 0 },
+                audio: { completed: 0, highScore: 0 },
+                logic: { completed: 0, highScore: 0 },
+                math: { completed: 0, highScore: 0 },
+                geo: { completed: 0, highScore: 0 },
+                art: { completed: 0, highScore: 0 }
+            }
         };
 
         // FUNZIONI GENERATRICI DI DOMANDE MIGLIORATE
@@ -1025,10 +1432,14 @@
             `;
             
             categories.forEach(cat => {
+                const progress = userState.loggedIn ? userState.progress[cat.id] : null;
+                const progressText = progress ? `Completato: ${progress.completed}%` : '';
+                
                 html += `
                     <div class="category-card" onclick="selectGame('${cat.id}')" style="border-left-color: ${cat.color}">
                         <h2>${cat.icon} ${cat.name}</h2>
                         <p>${questionDatabase[cat.id].instructions}</p>
+                        ${progressText ? `<p style="color: ${cat.color}; margin-top: 5px;">${progressText}</p>` : ''}
                     </div>
                 `;
             });
@@ -1054,10 +1465,14 @@
             `;
             
             questionDatabase[gameType].levels.forEach((level, index) => {
+                const progress = userState.loggedIn ? userState.progress[gameType] : null;
+                const progressText = progress && index <= progress.completed/50 ? `Punteggio: ${progress.highScore}` : '';
+                
                 html += `
                     <div class="option-card" onclick="startLevel(${index})">
                         <h3>${level.name}</h3>
                         <p>${level.questions.length} domande</p>
+                        ${progressText ? `<p style="color: var(--accent-color); margin-top: 5px;">${progressText}</p>` : ''}
                     </div>
                 `;
             });
@@ -1238,6 +1653,11 @@
         function endMemoryGame(win) {
             clearInterval(gameState.memoryTimer);
             
+            // Aggiorna lo stato dell'utente se loggato
+            if (userState.loggedIn) {
+                updateUserProgress(win);
+            }
+            
             let html = `
                 <div class="fade-in" style="text-align: center;">
                     <h2>${win ? 'Hai vinto!' : 'Tempo scaduto!'}</h2>
@@ -1381,6 +1801,11 @@
             const totalQuestions = questionDatabase[gameState.currentGame].levels[gameState.currentLevel].questions.length;
             const accuracy = Math.round((gameState.correctAnswers / totalQuestions) * 100);
             
+            // Aggiorna lo stato dell'utente se loggato
+            if (userState.loggedIn) {
+                updateUserProgress(true);
+            }
+            
             let html = `
                 <div class="fade-in" style="text-align: center;">
                     <h2>Livello Completato!</h2>
@@ -1450,8 +1875,296 @@
             }
         }
 
+        // FUNZIONI DI AUTENTICAZIONE
+        function showLoginModal() {
+            closeModal('registerModal');
+            document.getElementById('loginModal').classList.add('show');
+        }
+
+        function showRegisterModal() {
+            closeModal('loginModal');
+            document.getElementById('registerModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        function loginUser(email, password) {
+            // Simulazione di login - in un'app reale qui ci sarebbe una chiamata API
+            if (email && password) {
+                // Crea un utente fittizio
+                userState.loggedIn = true;
+                userState.id = 'user_' + Math.random().toString(36).substr(2, 9);
+                userState.name = email.split('@')[0];
+                userState.email = email;
+                userState.highScore = Math.floor(Math.random() * 500);
+                userState.maxLevel = Math.floor(Math.random() * 5) + 1;
+                userState.gamesPlayed = Math.floor(Math.random() * 20) + 5;
+                userState.totalCorrect = Math.floor(Math.random() * 200) + 50;
+                userState.totalQuestions = userState.totalCorrect + Math.floor(Math.random() * 100);
+                
+                // Aggiorna l'interfaccia
+                updateAuthUI();
+                closeModal('loginModal');
+                showHomeScreen();
+                
+                return true;
+            }
+            return false;
+        }
+
+        function registerUser(name, email, password) {
+            // Simulazione di registrazione - in un'app reale qui ci sarebbe una chiamata API
+            if (name && email && password) {
+                // Crea un utente fittizio
+                userState.loggedIn = true;
+                userState.id = 'user_' + Math.random().toString(36).substr(2, 9);
+                userState.name = name;
+                userState.email = email;
+                userState.highScore = 0;
+                userState.maxLevel = 1;
+                userState.gamesPlayed = 0;
+                userState.totalCorrect = 0;
+                userState.totalQuestions = 0;
+                
+                // Resetta i progressi
+                for (const game in userState.progress) {
+                    userState.progress[game] = { completed: 0, highScore: 0 };
+                }
+                
+                // Aggiorna l'interfaccia
+                updateAuthUI();
+                closeModal('registerModal');
+                showHomeScreen();
+                
+                return true;
+            }
+            return false;
+        }
+
+        function logout() {
+            userState.loggedIn = false;
+            updateAuthUI();
+            showHomeScreen();
+            closeModal('profileModal');
+            closeModal('leaderboardModal');
+        }
+
+        function updateAuthUI() {
+            if (userState.loggedIn) {
+                document.getElementById('authSection').classList.add('hidden');
+                document.getElementById('userSection').classList.remove('hidden');
+                
+                // Aggiorna avatar con iniziale
+                const avatar = document.getElementById('userAvatar');
+                avatar.textContent = userState.name.charAt(0).toUpperCase();
+                
+                // Colore basato sull'email (per diversità)
+                const colors = ['#BB86FC', '#03DAC6', '#FF7597', '#FF9E22', '#4CAF50', '#9C27B0'];
+                const colorIndex = userState.email.length % colors.length;
+                avatar.style.backgroundColor = colors[colorIndex];
+            } else {
+                document.getElementById('authSection').classList.remove('hidden');
+                document.getElementById('userSection').classList.add('hidden');
+            }
+        }
+
+        function showProfile() {
+            document.getElementById('profileName').textContent = userState.name;
+            document.getElementById('profileEmail').textContent = userState.email;
+            document.getElementById('profileHighScore').textContent = userState.highScore;
+            document.getElementById('profileMaxLevel').textContent = userState.maxLevel;
+            document.getElementById('profileGamesPlayed').textContent = userState.gamesPlayed;
+            
+            const accuracy = userState.totalQuestions > 0 
+                ? Math.round((userState.totalCorrect / userState.totalQuestions) * 100)
+                : 0;
+            document.getElementById('profileAccuracy').textContent = accuracy + '%';
+            
+            // Aggiorna avatar
+            const avatar = document.getElementById('profileAvatar');
+            avatar.textContent = userState.name.charAt(0).toUpperCase();
+            const colors = ['#BB86FC', '#03DAC6', '#FF7597', '#FF9E22', '#4CAF50', '#9C27B0'];
+            const colorIndex = userState.email.length % colors.length;
+            avatar.style.backgroundColor = colors[colorIndex];
+            
+            // Aggiorna progressi
+            const progressContainer = document.getElementById('profileProgress');
+            progressContainer.innerHTML = '';
+            
+            for (const game in userState.progress) {
+                const progress = userState.progress[game];
+                const gameName = getGameName(game);
+                
+                const progressEl = document.createElement('div');
+                progressEl.style.marginBottom = '15px';
+                
+                progressEl.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>${gameName}</span>
+                        <span>${progress.completed}%</span>
+                    </div>
+                    <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;">
+                        <div style="height: 100%; width: ${progress.completed}%; background: var(--accent-color); border-radius: 4px;"></div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 3px;">
+                        Punteggio massimo: ${progress.highScore}
+                    </div>
+                `;
+                
+                progressContainer.appendChild(progressEl);
+            }
+            
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function showLeaderboard() {
+            updateLeaderboard();
+            document.getElementById('leaderboardModal').classList.add('show');
+        }
+
+        function updateLeaderboard() {
+            const filter = document.getElementById('leaderboardFilter').value;
+            const tbody = document.getElementById('leaderboardBody');
+            tbody.innerHTML = '';
+            
+            // Simulazione dati classifica - in un'app reale questi dati verrebbero da un'API
+            const users = [
+                { id: userState.id, name: userState.name, score: userState.highScore, level: userState.maxLevel },
+                { id: 'user_2', name: 'Giocatore1', score: 450, level: 5 },
+                { id: 'user_3', name: 'BrainMaster', score: 620, level: 7 },
+                { id: 'user_4', name: 'QuizKing', score: 380, level: 4 },
+                { id: 'user_5', name: 'MemoriaPro', score: 510, level: 6 },
+                { id: 'user_6', name: 'LogicaStar', score: 290, level: 3 },
+                { id: 'user_7', name: 'Matemago', score: 570, level: 6 },
+                { id: 'user_8', name: 'GeoGenio', score: 420, level: 5 },
+                { id: 'user_9', name: 'Artista', score: 340, level: 4 },
+                { id: 'user_10', name: 'Principiante', score: 150, level: 2 }
+            ];
+            
+            // Ordina per punteggio
+            users.sort((a, b) => b.score - a.score);
+            
+            // Filtra se necessario
+            const filteredUsers = filter === 'all' ? users : users; // In una vera app, filtra per categoria
+            
+            filteredUsers.forEach((user, index) => {
+                const tr = document.createElement('tr');
+                const isCurrentUser = user.id === userState.id;
+                
+                tr.innerHTML = `
+                    <td class="${isCurrentUser ? 'user-rank' : ''}">${index + 1}</td>
+                    <td class="${isCurrentUser ? 'user-rank' : ''}">${user.name}</td>
+                    <td>${user.score}</td>
+                    <td>${user.level}</td>
+                `;
+                
+                if (isCurrentUser) {
+                    tr.style.fontWeight = 'bold';
+                    tr.style.color = 'var(--accent-color)';
+                }
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateUserProgress(gameWon) {
+            if (!userState.loggedIn) return;
+            
+            // Aggiorna statistiche globali
+            userState.gamesPlayed++;
+            
+            // Aggiorna punteggio massimo globale
+            if (gameState.score > userState.highScore) {
+                userState.highScore = gameState.score;
+            }
+            
+            // Aggiorna livello massimo
+            const currentLevelNumber = gameState.currentLevel + 1;
+            if (currentLevelNumber > userState.maxLevel) {
+                userState.maxLevel = currentLevelNumber;
+            }
+            
+            // Aggiorna statistiche di precisione
+            const totalQuestions = questionDatabase[gameState.currentGame].levels[gameState.currentLevel].questions.length;
+            userState.totalCorrect += gameState.correctAnswers;
+            userState.totalQuestions += totalQuestions;
+            
+            // Aggiorna progressi per categoria
+            const categoryProgress = userState.progress[gameState.currentGame];
+            
+            // Calcola completamento (0-100%)
+            const levelCompletion = Math.min(100, (gameState.currentLevel + 1) / questionDatabase[gameState.currentGame].levels.length * 100);
+            
+            if (levelCompletion > categoryProgress.completed) {
+                categoryProgress.completed = levelCompletion;
+            }
+            
+            if (gameState.score > categoryProgress.highScore) {
+                categoryProgress.highScore = gameState.score;
+            }
+            
+            // Salva i dati (in un'app reale, qui ci sarebbe una chiamata API)
+            saveUserData();
+        }
+
+        function saveUserData() {
+            // In un'app reale, qui ci sarebbe una chiamata API per salvare i dati dell'utente
+            console.log('Dati utente salvati:', userState);
+        }
+
+        // EVENT LISTENERS
+        document.getElementById('loginBtn').addEventListener('click', showLoginModal);
+        document.getElementById('registerBtn').addEventListener('click', showRegisterModal);
+        
+        document.getElementById('userProfile').addEventListener('click', function() {
+            document.getElementById('userMenu').classList.toggle('show');
+        });
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (loginUser(email, password)) {
+                // Login riuscito
+            } else {
+                alert('Email o password non validi');
+            }
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                alert('Le password non coincidono');
+                return;
+            }
+            
+            if (registerUser(name, email, password)) {
+                // Registrazione riuscita
+            } else {
+                alert('Compila tutti i campi');
+            }
+        });
+        
+        // Chiudi menu utente quando si clicca altrove
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#userProfile')) {
+                document.getElementById('userMenu').classList.remove('show');
+            }
+        });
+
         // INIZIALIZZA IL GIOCO
-        window.onload = showHomeScreen;
+        window.onload = function() {
+            updateAuthUI();
+            showHomeScreen();
+        };
     </script>
 </body>
 </html>
